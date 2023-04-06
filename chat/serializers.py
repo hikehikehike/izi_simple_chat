@@ -24,8 +24,16 @@ class ThreadSerializer(serializers.ModelSerializer):
         return data
 
 
-class MessageSerializer(serializers.ModelSerializer):
-    sender = serializers.HiddenField(default=serializers.CurrentUserDefault())
+class ThreadListSerializer(ThreadSerializer):
+    participants = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="username"
+    )
+
+
+class MessageListSerializer(serializers.ModelSerializer):
+    sender = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="username"
+    )
 
     class Meta:
         model = Message
@@ -37,6 +45,10 @@ class MessageSerializer(serializers.ModelSerializer):
             "created",
             "is_read",
         )
+
+
+class MessageSerializer(MessageListSerializer):
+    sender = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     def create(self, validated_data):
         validated_data["sender"] = self.context["request"].user
