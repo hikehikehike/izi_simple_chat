@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from rest_framework import viewsets
 
-# Create your views here.
+from chat.models import Thread
+from chat.serializers import ThreadSerializer, MessageSerializer
+
+
+class ThreadViewSet(viewsets.ModelViewSet):
+    queryset = Thread.objects.all()
+    serializer_class = ThreadSerializer
+
+
+class MessageViewSet(viewsets.ModelViewSet):
+    queryset = Thread.objects.all()
+    serializer_class = MessageSerializer
