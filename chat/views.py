@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 
-from chat.models import Thread
+from chat.models import Thread, Message
 from chat.serializers import ThreadSerializer, MessageSerializer
 
 
@@ -10,5 +10,5 @@ class ThreadViewSet(viewsets.ModelViewSet):
 
 
 class MessageViewSet(viewsets.ModelViewSet):
-    queryset = Thread.objects.all()
+    queryset = Message.objects.all()
     serializer_class = MessageSerializer
