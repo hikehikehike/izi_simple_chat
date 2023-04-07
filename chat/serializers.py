@@ -5,6 +5,10 @@ from chat.models import Thread, Message
 
 
 class ThreadSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Thread model.
+    """
+
     class Meta:
         model = Thread
         fields = (
@@ -19,6 +23,10 @@ class ThreadSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
+        """
+        Validate that the Thread has exactly 2 participants
+        and that the current user is one of them.
+        """
         if len(data["participants"]) != 2:
             raise ValidationError("Thread must have exactly 2 participants.")
         if self.context["request"].user not in data["participants"]:
@@ -29,6 +37,10 @@ class ThreadSerializer(serializers.ModelSerializer):
 
 
 class ThreadListSerializer(ThreadSerializer):
+    """
+    Serializer for a list of Threads.
+    """
+
     participants = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field="username"
     )
@@ -46,6 +58,9 @@ class ThreadListSerializer(ThreadSerializer):
 
     @staticmethod
     def get_last_message(obj):
+        """
+        Get the last message in the Thread.
+        """
         last_message = obj.messages.order_by("-created_at").first()
         if last_message:
             return {
@@ -59,6 +74,10 @@ class ThreadListSerializer(ThreadSerializer):
 
 
 class MessageListSerializer(serializers.ModelSerializer):
+    """
+    Serializer for a list of Messages.
+    """
+
     sender = serializers.SlugRelatedField(
         many=False, read_only=True, slug_field="username"
     )
@@ -77,11 +96,21 @@ class MessageListSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(MessageListSerializer):
+    """
+    Serializer for the Message model.
+    """
+
     def create(self, validated_data):
+        """
+        Create a new Message object and set the sender to the current user.
+        """
         validated_data["sender"] = self.context["request"].user
         return super().create(validated_data)
 
     def validate(self, data):
+        """
+        Validate that the current user is a participant in the Thread that the Message belongs to.
+        """
         thread = data.get("thread")
         participants = thread.participants.all()
 
