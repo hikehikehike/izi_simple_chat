@@ -25,7 +25,6 @@ class ThreadViewSet(viewsets.ModelViewSet):
 
 
 class MessageViewSet(viewsets.ModelViewSet):
-    queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
 
@@ -37,8 +36,14 @@ class MessageViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         thread = Thread.objects.filter(participants=self.request.user)
         if "pk" in self.kwargs:
-            return Message.objects.filter(thread__in=thread, id=self.kwargs["pk"])
-        return Message.objects.filter(thread__in=thread)
+            queryset = Message.objects.select_related("thread", "sender").filter(
+                thread__in=thread, id=self.kwargs["pk"]
+            )
+        else:
+            queryset = Message.objects.select_related("thread", "sender").filter(
+                thread__in=thread
+            )
+        return queryset
 
     @action(detail=True, methods=["post"])
     def mark_message_as_read(self, request, pk=None):
@@ -55,13 +60,14 @@ class MessageViewSet(viewsets.ModelViewSet):
 
 
 class MessageListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         thread_id = self.kwargs["pk"]
-        return Message.objects.filter(thread_id=thread_id)
+        return Message.objects.select_related("thread", "sender").filter(
+            thread_id=thread_id
+        )
 
     def perform_create(self, serializer):
         thread_id = self.kwargs["pk"]
