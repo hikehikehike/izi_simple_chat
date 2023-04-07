@@ -72,6 +72,7 @@ class MessageListSerializer(serializers.ModelSerializer):
             "created",
             "is_read",
         )
+        read_only_fields = ("is_read",)
 
 
 class MessageSerializer(MessageListSerializer):
