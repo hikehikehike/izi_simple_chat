@@ -44,7 +44,8 @@ class ThreadListSerializer(ThreadSerializer):
             "last_message",
         )
 
-    def get_last_message(self, obj):
+    @staticmethod
+    def get_last_message(obj):
         last_message = obj.messages.order_by("-created").first()
         if last_message:
             return {
