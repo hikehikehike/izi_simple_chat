@@ -10,12 +10,12 @@ class ThreadSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "participants",
-            "created",
-            "updated",
+            "created_at",
+            "updated_at",
         )
         read_only_fields = (
-            "created",
-            "updated",
+            "created_at",
+            "updated_at",
         )
 
     def validate(self, data):
@@ -39,20 +39,20 @@ class ThreadListSerializer(ThreadSerializer):
         fields = (
             "id",
             "participants",
-            "created",
-            "updated",
+            "created_at",
+            "updated_at",
             "last_message",
         )
 
     @staticmethod
     def get_last_message(obj):
-        last_message = obj.messages.order_by("-created").first()
+        last_message = obj.messages.order_by("-created_at").first()
         if last_message:
             return {
                 "id": last_message.id,
                 "sender": last_message.sender.username,
                 "text": last_message.text,
-                "created": last_message.created,
+                "created_at": last_message.created_at,
                 "is_read": last_message.is_read,
             }
         return None
@@ -70,7 +70,7 @@ class MessageListSerializer(serializers.ModelSerializer):
             "sender",
             "text",
             "thread",
-            "created",
+            "created_at",
             "is_read",
         )
         read_only_fields = ("is_read",)

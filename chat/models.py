@@ -1,24 +1,28 @@
 from django.db import models
-from user.models import User
 
 
-class Thread(models.Model):
-    participants = models.ManyToManyField(User, related_name="threads")
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-updated"]
+        abstract = True
 
 
-class Message(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
+class Thread(BaseModel):
+    participants = models.ManyToManyField("user.User", related_name="threads")
+
+    class Meta:
+        ordering = ["-updated_at"]
+
+
+class Message(BaseModel):
+    sender = models.ForeignKey("user.User", on_delete=models.CASCADE, related_name="sender")
     text = models.TextField()
     thread = models.ForeignKey(
         Thread, on_delete=models.CASCADE, related_name="messages"
     )
-    created = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ["-created"]
+        ordering = ["-created_at"]
