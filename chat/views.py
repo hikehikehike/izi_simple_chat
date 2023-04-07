@@ -1,6 +1,7 @@
 from rest_framework import viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from chat.models import Thread, Message
@@ -15,6 +16,7 @@ from chat.serializers import (
 class ThreadViewSet(viewsets.ModelViewSet):
     queryset = Thread.objects.all()
     serializer_class = ThreadSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -25,6 +27,7 @@ class ThreadViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -54,6 +57,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 class MessageListCreateAPIView(generics.ListCreateAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         thread_id = self.kwargs["pk"]
